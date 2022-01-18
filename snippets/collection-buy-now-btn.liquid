@@ -48,65 +48,6 @@
   {%- endif -%}
 {%- endcapture -%}
 
-{%- assign product_img = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
-
-{%- assign double_img = false -%}
-{% if product.images[1].src and settings.image_hover_enable %}
-  {%- assign double_img = true -%}
-{% endif %}
-
-{%- if settings.image_autoheight_enable -%}
-{%- assign top_offset =  1 | divided_by: product.featured_image.aspect_ratio | times: 100 | divided_by: 2 -%}
-{%- capture auto_height -%}
-  {%- if product.featured_image.aspect_ratio < 1 -%}
-    style="width:{{ product.featured_image.aspect_ratio | times: 100 }}%; margin: 0 auto;"
-  {%- else -%}
-    style="padding:{{ 50 | minus: top_offset }}% 0;"
-  {%- endif -%}
-{%- endcapture -%}
-{%- endif -%}
-
-<div class="grid__item {{ grid_offset }} {{ grid_width_small }} {{ grid_width_medium }} {{ grid_width_large }}{% if on_sale %} on-sale{% endif %}{% if tagged %} tagged{% endif %} product-grid-item">
-  <div {{ auto_height }}>
-    <a href="{{ product.url | within: collection }}" class="lazy-image{% if double_img %} double__image{% endif %}" style="padding-top:{{ 1 | divided_by: product.featured_image.aspect_ratio | times: 100}}%; background-image:  url('{{ product.featured_image | img_url: '1x1' }}');">
-      <img class="lazyload fade-in"
-        alt="{{ product.featured_image.alt | default: product.title  }}"
-        data-src="{{ product_img }}"
-        data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048, 2450, 2700, 3000, 3350, 3750, 4100, 4480, 5800]"
-        data-aspectratio="{{  product.featured_image.aspect_ratio }}"
-        data-sizes="auto"/>
-      {% if double_img %}
-        <div class="collection__image__bottom lazyload" data-bgset="{% include 'bgset', image: product.images[1] %}"></div>
-      {% endif %}
-      {{ sticker }}
-    </a>
-  </div>
-  <noscript>
-    <a href="{{ product.url | within: collection }}">
-      <img src="{{ product.featured_image | img_url: '360x' }}" alt="{{ product.featured_image.alt | default: product.title  }}">
-    </a>
-  </noscript>
-  <div class="figcaption {{ settings.product_grid_style }} {{ settings.collection_text_alignment | default: 'text-center' }}">
-      <p class="price_wrapper">
-        <span class="price{% if on_sale %} on-sale{% endif %}">
-          {% if product.price_varies %}{{ 'products.general.from' | t }} {% endif %}
-          <span class="money">{{ product.price | money }}</span>
-        </span>
-        {% if sold_out %}
-        <a href="{{ product.url | within: collection | capitalize }}">
-    <p class="btn uppercase addToCart disabled">{{ 'products.product.sold_out' | t }}</p>
-    
-        <p class="h6 name_wrapper" style="margin-top:10px;">
-        {{ product.title }}
-    </p></a>
-        {% endif %}
-        {% if on_sale %}
-        <span class="compare-at">
-          <span class="money">{{ product.compare_at_price | money }}</span>
-        </span>
-        {% endif %}
-    </p>     
-
     {% unless sold_out %}
   <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form-{{ product.id }}" class="product-form">
     <div class="add-to-cart__wrapper" style="margin-top:0px; margin-bottom: 10px;">
@@ -144,6 +85,3 @@
           <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
         {% endif %}
     </a>
-
-  </div>
-</div>
