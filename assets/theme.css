@@ -7001,3 +7001,7 @@ hr {
 .shopify-payment-button__button--hidden {
   visibility: hidden;
 }
+
+a.grid-view-item__link { 
+  position: static; 
+}
