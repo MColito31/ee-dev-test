@@ -58,7 +58,7 @@
         {{ variant.title }}
       </option>
       {% else %}
-      <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+      <option>{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
       {% endif %}
       {% endfor %}
     </select>
@@ -76,12 +76,5 @@
     </div>
     {% endform %}
   </div>
-
-</div>
-
-<style>
-  .shopify-payment-button__button--hidden { visibility: visible; }
-  a.grid-view-item__link { position: static; }
-</style>
 
 </div>
