@@ -6999,5 +6999,5 @@ hr {
 
 /* Custom CSS - Buy Button */
 .shopify-payment-button__button--hidden {
-  visibility: hidden !important;
+  visibility: hidden;
 }
