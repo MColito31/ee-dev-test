@@ -46,6 +46,42 @@
 
   {% include 'product-price-listing', product: product, show_vendor: show_vendor %}
 
-  {% include 'collection-buy-now-btn' %}
+ <div>
+    {% capture "form_classes" -%}
+    product-form product-form-{{ section.id }}{% unless section.settings.show_variant_labels %} product-form--hide-variant-labels{% endunless %} product-form--payment-button-no-variants
+    {%- endcapture %}
+    {% form 'product', product, class:form_classes, novalidate: 'novalidate' %}
+    <select name="id" id="ProductSelect-{{ section.id }}" class="product-form__variants no-js">
+      {% for variant in product.variants %}
+      {% if variant.available %}
+      <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}">
+        {{ variant.title }}
+      </option>
+      {% else %}
+      <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+    <div class="product-form__item product-form__item--submit product-form__item--payment-button product-form__item--no-variants">
+      <div class="wrap-cart-buttons">
+        <div class="wrap-cart-buttons--quantity">
+          <label for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+          <input type="number" id="Quantity-{{ product.id }}" name="quantity" value="1" min="1" class="product-form__input" pattern="[0-9]*">
+        </div>
+        <button type="submit" name="add" id="AddToCart-{{ product.id }}" class="btn btn--secondary-accent">
+          <span id="AddToCartText-{{ product.id }}">Add</span>
+        </button>
+      </div>
+      {{ form | payment_button }}
+    </div>
+    {% endform %}
+  </div>
+
+</div>
+
+<style>
+  .shopify-payment-button__button--hidden { visibility: visible; }
+  a.grid-view-item__link { position: static; }
+</style>
 
 </div>
