@@ -10,7 +10,7 @@
         {{ variant.title }}
       </option>
       {% else %}
-      <option class="hide">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+      <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
       {% endif %}
       {% endfor %}
     </select>
