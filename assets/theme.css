@@ -7005,3 +7005,7 @@ hr {
 a.grid-view-item__link { 
   position: static; 
 }
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+}
