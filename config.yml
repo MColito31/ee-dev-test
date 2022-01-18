@@ -1,0 +1,9 @@
+development:
+  password: shptka_c5a6f4ca9b512a2f2460b433325e5be1
+  theme_id: "130223341823"
+  store: mcoys-dev-store.myshopify.com
+  proxy: http://localhost:3000
+  ignore_files:
+    - "*.gif"
+    - "*.jpg"
+    - config/settings_data.json
