@@ -1,87 +1,73 @@
-{%- assign on_sale = false -%}
-{%- if product.compare_at_price > product.price -%}
-  {%- assign on_sale = true -%}
-{%- endif -%}
+<div class="grid-view-item{% unless product.available %} grid-view-item--sold-out{% endunless %} product-card">
 
-{%- assign sold_out = true -%}
-{%- if product.available -%}
-  {%- assign sold_out = false -%}
-{%- endif -%}
+  <a class="grid-view-item__link grid-view-item__image-container full-width-link" href="{{ product.url | within: collection }}">
+    <span class="visually-hidden">{{ product.title }}</span>
+  </a>
 
-{%- assign new_product = false -%}
-{%- assign published_date = product.published_at | date: "%s"  -%}
-{%- assign now_date = 'now' | date: "%s" -%}
-{%- assign age_in_days = now_date | minus: published_date | divided_by: 60 | divided_by: 60 | divided_by: 12 -%}
-{%- if age_in_days < settings.tag_new_limit -%}
-  {%- assign new_product = true -%}
-{%- endif -%}
+  {% capture img_id %}ProductCardImage-{{ section.id }}-{{ product.id }}{% endcapture %}
+  {% capture wrapper_id %}ProductCardImageWrapper-{{ section.id }}-{{ product.id }}{% endcapture %}
+  {%- assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
 
-{%- assign sellout_tag = false -%}
-{%- if sold_out and settings.tag_sellout -%}
-  {%- assign sellout_tag = true -%}
-{%- endif -%}
+  {% unless product.featured_image == blank %}
+  {% include 'image-style' with image: product.featured_image, width: max_height, height: max_height, small_style: true, wrapper_id: wrapper_id, img_id: img_id %}
+  {% endunless %}
 
-{%- assign new_tag = false -%}
-{%- if new_product and settings.tag_new -%}
-  {%- assign new_tag = true -%}
-{%- endif -%}
-
-{%- assign sale_tag = false -%}
-{%- if on_sale and settings.tag_sale -%}
-  {%- assign sale_tag = true -%}
-{%- endif -%}
-
-{%- assign tagged = false -%}
-{%- if sellout_tag or new_tag or sale_tag -%}
-  {%- assign tagged = true -%}
-{%- endif -%}
-
-{%- capture sticker -%}
-  {%- if tagged %}
-    {%- if sellout_tag -%}
-      <div class="sticker sticker--sold">{{ 'products.product.sold_out' | t }}</div>
-    {%- elsif sale_tag -%}
-      <div class="sticker sticker--sale">{{ 'products.product.sale' | t }}</div>
-    {%- elsif new_tag -%}
-      <div class="sticker sticker--new">{{ 'products.product.new' | t }}</div>
-    {%- endif -%}
-  {%- endif -%}
-{%- endcapture -%}
-
-    {% unless sold_out %}
-  <form action="/cart/add" method="post" enctype="multipart/form-data" id="product-form-{{ product.id }}" class="product-form">
-    <div class="add-to-cart__wrapper" style="margin-top:0px; margin-bottom: 10px;">
-      <button type="submit" name="add" class="btn btn--splash uppercase addToCart">
-        <span id="AddToCartText">Buy Now</span>
-      </button>
+  <div id="{{ wrapper_id }}" class="grid-view-item__image-wrapper product-card__image-wrapper js">
+    <div style="padding-top:{% unless product.featured_image == blank %}{{ 1 | divided_by: product.featured_image.aspect_ratio | times: 100}}%{% else %}100%{% endunless %};">
+      <img id="{{ img_id }}"
+           class="grid-view-item__image lazyload"
+           src="{{ product.featured_image | img_url: '300x300' }}"
+           data-src="{{ img_url }}"
+           data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+           data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+           data-sizes="auto"
+           alt="{{ product.featured_image.alt }}">
     </div>
-  <a href="{{ product.url | within: collection | capitalize }}">
-        <p class="h6 name_wrapper">
-        {{ product.title }}
-    </p></a>
-     
-    {% if product.variants.size == 1 %}
-    	<input type="hidden" id="variant-select" name="id" value="{{ product.variants.first.id }}" />
-    {% else %}
-    <div class="selector-wrapper">
-      <select name="id" id="productSelect" class="product-single__variants btn--full uppercase">
-        {% for variant in product.variants %}
-          {% if variant.available %}
-            	<option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}" data-sku="{{ variant.sku }}">{{ variant.title }}</option>
-            {% else %}
-              <option disabled="disabled">
-                {{ variant.title }} - {{ 'products.product.sold_out' | t }}
-              </option>
-          {% endif %}
-        {% endfor %}
-      </select>
+  </div>
+
+  <noscript>
+    {% capture image_size %}{{ max_height }}x{{ max_height }}{% endcapture %}
+    <img class="grid-view-item__image" src="{{ product.featured_image.src | img_url: image_size, scale: 2 }}" alt="{{ product.featured_image.alt }}" style="max-width: {{ max_height | times: product.featured_image.aspect_ratio }}px;">
+  </noscript>
+
+  <div class="h4 grid-view-item__title product-card__title" aria-hidden="true">{{ product.title }}</div>
+
+  {% include 'product-price', variant: product %}
+
+  <div>
+    {% capture "form_classes" -%}
+    product-form product-form-{{ section.id }}{% unless section.settings.show_variant_labels %} product-form--hide-variant-labels{% endunless %} product-form--payment-button-no-variants
+    {%- endcapture %}
+    {% form 'product', product, class:form_classes, novalidate: 'novalidate' %}
+    <select name="id" id="ProductSelect-{{ section.id }}" class="product-form__variants no-js">
+      {% for variant in product.variants %}
+      {% if variant.available %}
+      <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}">
+        {{ variant.title }}
+      </option>
+      {% else %}
+      <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+    <div class="product-form__item product-form__item--submit product-form__item--payment-button product-form__item--no-variants">
+      <div class="wrap-cart-buttons">
+        <div class="wrap-cart-buttons--quantity">
+          <label for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+          <input type="number" id="Quantity-{{ product.id }}" name="quantity" value="1" min="1" class="product-form__input" pattern="[0-9]*">
+        </div>
+        <button type="submit" name="add" id="AddToCart-{{ product.id }}" class="btn btn--secondary-accent">
+          <span id="AddToCartText-{{ product.id }}">Add</span>
+        </button>
+      </div>
+      {{ form | payment_button }}
     </div>
-    {% endif %}
-  </form>  
-    {% endunless %}
-    
-    <a href="{{ product.url | within: collection | capitalize }}">
-        {% if product.metafields.spr.reviews %}
-          <span class="shopify-product-reviews-badge" data-id="{{ product.id }}"></span>
-        {% endif %}
-    </a>
+    {% endform %}
+  </div>
+
+</div>
+
+<style>
+  .shopify-payment-button__button--hidden { visibility: visible; }
+  a.grid-view-item__link { position: static; }
+</style>
