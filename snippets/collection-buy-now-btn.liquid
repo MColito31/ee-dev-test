@@ -1,7 +1,20 @@
+<form action="/cart/add" method="post" class="variants" id="product-actions-{{ product.id }}" enctype="multipart/form-data">
+<input type="hidden" name="variantId" value="{{ product.variants[0].id }}" />
+<button class="button buynow-btn" title="Buy" onClick="buyNow()"><span>Buy now</span></button>
+</form>
 
-    
-    <div class="product-form__item product-form__item--submit product-form__item--payment-button product-form__item--no-variants">
-      {{ form | payment_button }}
-    </div>
-    {% endform %}
- 
+function buyNow(){
+     var $ = jQuery;
+
+   var formParams = $('form.cart').serialize();
+     $.ajax({
+      url: "/cart/add",
+      type: "post",
+      data: formParams,
+      success: function(){ 
+       window.location.href = "/checkout";
+      },
+      error: function(){
+      }
+     })
+ }
