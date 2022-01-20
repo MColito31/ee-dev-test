@@ -45,7 +45,9 @@
   <div class="h4 grid-view-item__title product-card__title" aria-hidden="true">{{ product.title }}</div>
 
   {% include 'product-price-listing', product: product, show_vendor: show_vendor %}
-
-  {% include 'collection-buy-now-btn' %}
+ 
+  {% if section.settings.buy_now_enable %}
+    {% include 'collection-buy-now-btn' %}
+  {% endif %}
 
 </div>
