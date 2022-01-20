@@ -1,23 +1,22 @@
-<form action="/cart/add" method="post" class="variants" id="product-actions-{{ product.id }}" enctype="multipart/form-data">
-<input type="hidden" name="variantId" value="{{ product.variants[0].id }}" />
-<button class="button buynow-btn" title="Buy" onClick="buyNow()"><span>Buy now</span></button>
-</form>
-
-<script>
-function buyNow(){
-     var $ = jQuery;
-
-   var formParams = $('form.cart').serialize();
-     $.ajax({
-      url: "/cart/add",
-      type: "post",
-      data: formParams,
-      success: function(){ 
-       window.location.href = "/checkout";
-      },
-      error: function(){
-      }
-     })
- }
- </script>
- 
+  <div>
+    {% capture "form_classes" -%}
+    product-form product-form-{{ section.id }}{% unless section.settings.show_variant_labels %} product-form--hide-variant-labels{% endunless %} product-form--payment-button-no-variants
+    {%- endcapture %}
+    {% form 'product', product, class:form_classes, novalidate: 'novalidate' %}
+    <select name="id" id="ProductSelect-{{ section.id }}" class="product-form__variants no-js">
+      {% for variant in product.variants %}
+      {% if variant.available %}
+      <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}">
+        {{ variant.title }}
+      </option>
+      {% else %}
+      <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+      {% endif %}
+      {% endfor %}
+    </select>
+    
+    <div class="product-form__item product-form__item--submit product-form__item--payment-button product-form__item--no-variants">
+      {{ form | payment_button }}
+    </div>
+    {% endform %}
+  </div>
