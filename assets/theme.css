@@ -6997,4 +6997,8 @@ hr {
 .store-availability-list__phone {
   margin-bottom: 0; }
 
-  
+/* Buy button - Collection Page */
+
+.shopify-payment-button__button--hidden { 
+  visibility: hidden; 
+}
